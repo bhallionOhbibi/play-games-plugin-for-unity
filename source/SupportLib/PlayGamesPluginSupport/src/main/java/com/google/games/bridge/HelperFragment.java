@@ -19,6 +19,7 @@ package com.google.games.bridge;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
@@ -28,8 +29,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -48,10 +49,8 @@ public class HelperFragment extends Fragment
     static final int RC_SELECT_SNAPSHOT_UI = 9004;
     static final int RC_CAPTURE_OVERLAY_UI = 9005;
     static final int RC_SELECT_OPPONENTS_UI = 9006;
-    static final int RC_INBOX_UI = 9007;
-    static final int RC_SHOW_WAITING_ROOM_UI = 9008;
-    static final int RC_SHOW_INVITATION_INBOX_UI = 9009;
-  static final int RC_SHOW_REQUEST_PERMISSIONS_UI = 9010;
+    static final int RC_SHOW_REQUEST_PERMISSIONS_UI = 9010;
+    static final int RC_RESOLUTION_DIALOG = 9011;
 
     // Pending token request.  There can be only one outstanding request at a
     // time.
@@ -160,50 +159,34 @@ public class HelperFragment extends Fragment
         return request.getTask();
     }
 
-    public static Task<BaseSelectOpponentsUiRequest.Result> showRtmpSelectOpponentsUi(Activity parentActivity, int minOpponents, int maxOpponents) {
-        RtmpSelectOpponentsUiRequest request = new RtmpSelectOpponentsUiRequest(minOpponents, maxOpponents);
+    public static boolean isResolutionRequired(Exception exception) {
+        if (exception instanceof ResolvableApiException) {
+            return true;
+        }
+        return false;
+    }
 
-        if(!HelperFragment.startRequest(parentActivity, request)) {
+    public static Task<Integer> askForLoadFriendsResolution(
+            Activity parentActivity, PendingIntent pendingIntent) {
+        GenericResolutionUiRequest request = new GenericResolutionUiRequest(pendingIntent);
+
+        if (!HelperFragment.startRequest(parentActivity, request)) {
             request.setResult(CommonUIStatus.UI_BUSY);
         }
-
         return request.getTask();
     }
 
-    public static Task<BaseSelectOpponentsUiRequest.Result> showTbmpSelectOpponentsUi(Activity parentActivity, int minOpponents, int maxOpponents) {
-        TbmpSelectOpponentsUiRequest request = new TbmpSelectOpponentsUiRequest(minOpponents, maxOpponents);
+    public static Task<Integer> showCompareProfileWithAlternativeNameHintsUI(
+            Activity parentActivity,
+            String playerId,
+            String otherPlayerInGameName,
+            String currentPlayerInGameName) {
+        CompareProfileUiRequest request = new CompareProfileUiRequest(
+                playerId,
+                otherPlayerInGameName,
+                currentPlayerInGameName);
 
-        if(!HelperFragment.startRequest(parentActivity, request)) {
-            request.setResult(CommonUIStatus.UI_BUSY);
-        }
-
-        return request.getTask();
-    }
-
-    public static Task<ShowWaitingRoomUiRequest.Result> showWaitingRoomUI(Activity parentActivity, Room room, int minParticipantsToStart) {
-        ShowWaitingRoomUiRequest request = new ShowWaitingRoomUiRequest(room, minParticipantsToStart);
-
-        if(!HelperFragment.startRequest(parentActivity, request)) {
-            request.setResult(ShowWaitingRoomUiRequest.UI_STATUS_BUSY, null);
-        }
-
-        return request.getTask();
-    }
-
-    public static Task<ShowInvitationInboxUIRequest.Result> showInvitationInboxUI(Activity parentActivity) {
-        ShowInvitationInboxUIRequest request = new ShowInvitationInboxUIRequest();
-
-        if(!HelperFragment.startRequest(parentActivity, request)) {
-            request.setResult(CommonUIStatus.UI_BUSY);
-        }
-
-        return request.getTask();
-    }
-
-  public static Task<InboxUiRequest.Result> showInboxUi(Activity parentActivity) {
-        InboxUiRequest request = new InboxUiRequest();
-
-        if(!HelperFragment.startRequest(parentActivity, request)) {
+        if (!HelperFragment.startRequest(parentActivity, request)) {
             request.setResult(CommonUIStatus.UI_BUSY);
         }
 

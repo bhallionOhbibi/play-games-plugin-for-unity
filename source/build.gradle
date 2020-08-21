@@ -68,7 +68,7 @@ project.ext {
     samplesBuildSrc = file('build/sampleSrc').absolutePath
     exportPath = file('build/plugin.unitypackage').absolutePath
     currentPluginPath = file('../current-build').absolutePath
-    currentPluginVersion = "0.10.09"
+    currentPluginVersion = "0.10.10"
     currentPluginBasename = 'GooglePlayGamesPlugin'
     currentPluginName = "${currentPluginBasename}-${currentPluginVersion}.unitypackage"
     resolverDir = new File('build/jarresolver').absolutePath
@@ -77,7 +77,6 @@ project.ext {
     pluginRepoDir = "${pluginProj}/${editorDir}/m2repository"
 
     sampleList = ['CubicPilot', 'Minimal',
-         'QuizRacer',  'TicTacToe',
          'NearbyDroids', 'SmokeTest']
 
 
